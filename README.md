@@ -1,6 +1,6 @@
 ![Pine Tree Tax](/images/pine_tree_tax_big.png)
 
-Pine Tree Tax is crypto currency tax preparation software
+Pine Tree Tax is crypto currency tax preparation software.
 
 
 # Cryptocurrencies according to the IRS
