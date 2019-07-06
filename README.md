@@ -1,7 +1,7 @@
-# pine-tree-tax
-Crypto currency tax preparation software
-
 ![Pine Tree Tax](/images/pine_tree_tax_big.png)
+
+Pine Tree Tax is crypto currency tax preparation software
+
 
 # Cryptocurrencies according to the IRS
 The IRS addressed the taxation of cryptocurrency transactions in [Notice 2014-21](https://www.irs.gov/pub/irs-drop/n-14-21.pdf). According to that notice crypto currencies are treated as property for tax purposes and taxpayers must recognize gain or loss on the exchange of cryptocurrency for cash or for other property. Gain or loss is also recognized every time a cryptocurrency is sold or used to purchase goods or services. 
