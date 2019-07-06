@@ -1,6 +1,6 @@
 ![Pine Tree Tax](/images/pine_tree_tax_big.png)
 
-Pine Tree Tax is crypto currency tax preparation software.
+Pine Tree Tax is a crypto currency capital gains calculator.
 
 
 # Cryptocurrencies according to the IRS
@@ -40,7 +40,7 @@ Capital gains or losses events are triggered when a cryptocurrency is sold for U
 
 PTT is a command line application that reads the crypto currency transactions from an input .csv file. Example transaction file:
 
-{% codeblock lang:csv  line_number:false %}
+
 | id | datetime                 | origin_wallet | origin_asset | origin_quantity | destination_wallet | destination_asset | destination_quantity | usd_value | usd_fee |
 |----+--------------------------+---------------+--------------+-----------------+--------------------+-------------------+----------------------+-----------+---------+
 |  1 | 2016-05-10T13:01:00.000Z | External      | BTC          |      0.18312594 | Coinbase           | BTC               |           0.18312594 |     83.23 |         |
@@ -51,7 +51,7 @@ PTT is a command line application that reads the crypto currency transactions fr
 |  6 | 2016-06-05T19:50:00.000Z | Coinbase      | BTC          |      0.02000000 | External           | BTC               |           0.02000000 |     11.51 |         |
 |  7 | 2016-06-07T15:37:00.000Z | External      | BTC          |      0.07062000 | Coinbase           | BTC               |           0.07062000 |     40.77 |         |
 |  8 | 2016-06-14T12:23:36.000Z | Gdax          | BTC          |      1.49551345 | Gdax               | ETH               |          55.22575516 |   1033.61 |    3.10 |
-{% endcodeblock %}
+
 
 The value in the field "usd_value" represents the market value of the transaction at the time the exchange took place.
 
@@ -60,7 +60,7 @@ The value in the field "usd_value" represents the market value of the transactio
 
 
 The application generates 2 output files in .csv format. One file for long and the other for short term capitail gains. Example output file:
-{% codeblock lang:csv  line_number:false %}
+
 
 |           quantity | asset | buy_date             | sell_date            | cost_basis | proceeds |     gain |
 |--------------------|-------|----------------------|----------------------|------------|----------|----------|
@@ -70,4 +70,10 @@ The application generates 2 output files in .csv format. One file for long and t
 |               0.05 | BTC   | 2016-06-24T13:29:33Z | 2017-12-04T00:40:00Z |       33.5 |    566.8 |    533.3 |
 |                  5 | BTC   | 2016-06-24T13:29:33Z | 2017-12-10T15:02:00Z |    3349.85 |    77000 | 73650.15 |
 |         0.16960901 | BTC   | 2016-06-24T13:29:33Z | 2017-12-18T16:55:00Z |     113.63 |  3218.38 |  3104.75 |
-{% endcodeblock %}
+
+
+# Running
+```
+cargo run
+```
+
