@@ -1,6 +1,6 @@
 ![Pine Tree Tax](/images/pine_tree_tax_big.png)
 
-Pine Tree Tax is a crypto currency capital gains calculator.
+Pine Tree Tax is a crypto currency capital gains calculator implemented in Rust.
 
 
 # Cryptocurrencies according to the IRS
@@ -40,7 +40,7 @@ Capital gains or losses events are triggered when a cryptocurrency is sold for U
 
 PTT is a command line application that reads the crypto currency transactions from an input .csv file. Example transaction file:
 
-
+```
 | id | datetime                 | origin_wallet | origin_asset | origin_quantity | destination_wallet | destination_asset | destination_quantity | usd_value | usd_fee |
 |----+--------------------------+---------------+--------------+-----------------+--------------------+-------------------+----------------------+-----------+---------+
 |  1 | 2016-05-10T13:01:00.000Z | External      | BTC          |      0.18312594 | Coinbase           | BTC               |           0.18312594 |     83.23 |         |
@@ -52,6 +52,7 @@ PTT is a command line application that reads the crypto currency transactions fr
 |  7 | 2016-06-07T15:37:00.000Z | External      | BTC          |      0.07062000 | Coinbase           | BTC               |           0.07062000 |     40.77 |         |
 |  8 | 2016-06-14T12:23:36.000Z | Gdax          | BTC          |      1.49551345 | Gdax               | ETH               |          55.22575516 |   1033.61 |    3.10 |
 
+```
 
 The value in the field "usd_value" represents the market value of the transaction at the time the exchange took place.
 
