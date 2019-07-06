@@ -74,9 +74,17 @@ The application generates 2 output files in .csv format. One file for long and t
 
 
 # Running
+## No arguments. Expects transactions.csv file in the current directory.
 ```
 cargo run
 ```
+## specify transaction file.
+```
+cargo run -transactions=<transaction_file.csv>
+```
+
+
+---
 
 
 PTT is based on [cryptogains](https://github.com/chadlieberman/cryptogains)
