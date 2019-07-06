@@ -78,3 +78,5 @@ The application generates 2 output files in .csv format. One file for long and t
 cargo run
 ```
 
+
+PTT is based on [cryptogains](https://github.com/chadlieberman/cryptogains)
