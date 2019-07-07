@@ -1,6 +1,6 @@
 ![Pine Tree Tax](/images/pine_tree_tax_big.png)
 
-Pine Tree Tax is a crypto currency capital gains calculator implemented in Rust.
+Pine Tree Tax is a crypto currency capital gains calculator implemented in [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)).
 
 
 # Cryptocurrencies according to the IRS
