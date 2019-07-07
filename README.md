@@ -59,9 +59,7 @@ The value in the field "usd_value" represents the market value of the transactio
 ---
 
 
-
-The application generates 2 output files in .csv format. One file for long and the other for short term capitail gains. Example output file:
-
+The application generates 2 output files in .csv format (long and short term capitail gains). Example output file:
 
 |           quantity | asset | buy_date             | sell_date            | cost_basis | proceeds |     gain |
 |--------------------|-------|----------------------|----------------------|------------|----------|----------|
