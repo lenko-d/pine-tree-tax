@@ -31,6 +31,8 @@ Cryptocurrency can be donated directly to a charity. The tax deduction will be e
 
 
 
+# Building Pine Tree Tax:
+
 
 PTT uses the FIFO (first in, first out) method of accounting. It considers every transaction between two different cryptocurrencies as a taxable event. It tracks the cost basis from the price of the original purchase and transferrs that cost basis from the original token to the new token.
 
