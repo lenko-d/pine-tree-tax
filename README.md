@@ -74,17 +74,34 @@ The application generates 2 output files in .csv format. One file for long and t
 
 
 # Running
-## No arguments. Expects transactions.csv file in the current directory.
+## No arguments. Expects transactions.csv file in the current directory:
 ```
 cargo run
 ```
-## specify transaction file.
+## Specify transactions file:
 ```
-cargo run -transactions=<transaction_file.csv>
+cargo run  <transaction_file.csv>
 ```
+
+``
+cargo run ./transactions.csv
+``
 
 
 ---
+
+# Contributing
+
+1. Fork it
+2. Download your fork to your PC (`git clone https://github.com/your_username/cobra && cd cobra`)
+3. Create your feature branch (`git checkout -b my-new-feature`)
+4. Make changes and add them (`git add .`)
+5. Commit your changes (`git commit -m 'Add some feature'`)
+6. Push to the branch (`git push origin my-new-feature`)
+7. Create new pull request
+
+---
+
 
 
 PTT is based on [cryptogains](https://github.com/chadlieberman/cryptogains)
