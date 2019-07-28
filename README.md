@@ -75,18 +75,20 @@ The application generates 2 output files in .csv format (long and short term cap
 
 
 # Running
-## No arguments. Expects transactions.csv file in the current directory:
+## Process a transaction file and generate long and short term capital gains reports in .csv format:
 ```
-cargo run
+cargo run -- <INPUT_FILE_NAME>
 ```
-## Specify transactions file:
+## Convert from Kraken transaction format to Pinte Tree Tax format:
 ```
-cargo run  <transaction_file.csv>
+cargo run --   trades.csv -c kraken 
 ```
 
-``
-cargo run ./transactions.csv
-``
+## Convert from Bittrex transaction format to Pinte Tree Tax format:
+```
+cargo run --  BittrexOrderHistory_2017.csv -c bittrex
+```
+
 
 
 ---

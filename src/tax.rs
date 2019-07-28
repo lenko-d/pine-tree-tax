@@ -6,26 +6,29 @@ use self::chrono::Duration;
 use std::error::Error;
 use std::fs::File;
 
+use serde::{Deserialize, Serialize};
+
 use account::Account;
 use account::Deposit;
 
 const WALLET_EXTERNAL: &str = "External";
 const WALLET_NA: &str = "N/A";
+
 const CAPITAL_GAIN_TYPE_LONG: &str = "long";
 const CAPITAL_GAIN_TYPE_SHORT: &str = "short";
 
-#[derive(Debug, Deserialize)]
-struct Transaction {
-    id: i32,
-    datetime: DateTime<Utc>,
-    origin_wallet: String,
-    origin_asset: String,
-    origin_quantity: f64,
-    destination_wallet: String,
-    destination_asset: String,
-    destination_quantity: f64,
-    usd_value: f64,
-    usd_fee: Option<f64>,
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Transaction {
+    pub id: String,
+    pub datetime: DateTime<Utc>,
+    pub origin_wallet: String,
+    pub origin_asset: String,
+    pub origin_quantity: f64,
+    pub destination_wallet: String,
+    pub destination_asset: String,
+    pub destination_quantity: f64,
+    pub usd_value: f64,
+    pub usd_fee: Option<f64>,
 }
 
 #[derive(Debug, Serialize)]
@@ -39,7 +42,7 @@ struct TaxEvent {
     gain: f64,
 }
 
-pub fn calculate_capital_gains(file_path: &str) {
+pub fn calculate_capital_gains(file_path: &str, output_file: &str, output_positions: u64) {
     let mut transactions = read_transactions(file_path).expect("Can't read transactions");
     transactions.sort_by(|t1, t2| t1.datetime.cmp(&t2.datetime));
 
@@ -50,6 +53,12 @@ pub fn calculate_capital_gains(file_path: &str) {
         "BCH".to_string() =>  Account::new("BCH".to_string(), 0.0),
         "LTC".to_string() =>  Account::new("LTC".to_string(), 0.0),
         "XRP".to_string() =>  Account::new("XRP".to_string(), 0.0),
+        "XBT".to_string() =>  Account::new("XBT".to_string(), 0.0),
+        "XMR".to_string() =>  Account::new("XMR".to_string(), 0.0),
+        "ZEC".to_string() =>  Account::new("ZEC".to_string(), 0.0),
+        "ADA".to_string() =>  Account::new("ADA".to_string(), 0.0),
+        "BITB".to_string() =>  Account::new("BITB".to_string(), 0.0),
+        "XZC".to_string() =>  Account::new("XZC".to_string(), 0.0),
     };
 
     let mut tax_events: Vec<TaxEvent> = Vec::new();
@@ -96,11 +105,22 @@ pub fn calculate_capital_gains(file_path: &str) {
         }
     }
 
-    dbg!(accounts);
+    if output_positions > 0 {
+        dbg!(accounts);
+    }
+
     //dbg!(&tax_events);
 
-    save_to_file(&tax_events, "long_gains.csv", CAPITAL_GAIN_TYPE_LONG);
-    save_to_file(&tax_events, "short_gains.csv", CAPITAL_GAIN_TYPE_SHORT);
+    save_to_file(
+        &tax_events,
+        &(output_file.to_owned() + "_long_gains.csv"),
+        CAPITAL_GAIN_TYPE_LONG,
+    );
+    save_to_file(
+        &tax_events,
+        &(output_file.to_owned() + "_short_gains.csv"),
+        CAPITAL_GAIN_TYPE_SHORT,
+    );
 }
 
 fn save_to_file(tax_events: &Vec<TaxEvent>, out_file: &str, filter_by: &str) {
@@ -126,7 +146,7 @@ fn save_to_file(tax_events: &Vec<TaxEvent>, out_file: &str, filter_by: &str) {
     }
 }
 
-fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>> {
+pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>> {
     let file = File::open(file_path)?;
     let mut reader = csv::Reader::from_reader(file);
     let mut transactions = Vec::new();

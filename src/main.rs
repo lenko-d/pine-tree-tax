@@ -1,34 +1,79 @@
-#[macro_use]
-extern crate serde_derive;
 extern crate clap;
 
 #[macro_use]
 extern crate maplit;
 
+#[macro_use]
+extern crate lazy_static;
+
+extern crate serde;
+
 mod account;
+mod conversions;
 mod tax;
 
 use clap::{App, Arg, ArgMatches};
+use conversions::*;
 use tax::*;
 
 fn read_arguments<'a>() -> ArgMatches<'a> {
     App::new("Pine Tree Tax")
         .version("0.01")
         .arg(
-            Arg::with_name("transactions")
-                .help("The input transaction history csv file to use.")
+            Arg::with_name("INPUT_FILE")
+                .help("Sets the input file to use")
                 .required(true)
-                .default_value("./transactions.csv")
                 .index(1),
+        )
+        .arg(
+            Arg::with_name("convert-from")
+                .short("c")
+                .long("convert-from")
+                .required(false)
+                .help("Convert from another format.")
+                .takes_value(true)
+                .value_name("FILE_FORMAT"),
+        )
+        .arg(
+            Arg::with_name("p")
+                .short("p")
+                .help("Output the positions in the accounts."),
+        )
+        .arg(
+            Arg::with_name("output-file")
+                .help("Output file.")
+                .required(false)
+                .value_name("OUTPUT_FILE"),
         )
         .get_matches()
 }
 
 fn main() {
     let cli_args = read_arguments();
-    let file_path = cli_args
-        .value_of("transactions")
-        .expect("No input filename given.");
+    let input_file = cli_args.value_of("INPUT_FILE").unwrap();
 
-    calculate_capital_gains(file_path);
+    if let Some(convert_from_another_format) = cli_args.value_of("convert-from") {
+        let output_file = cli_args
+            .value_of("output-file")
+            .unwrap_or("_transactions.csv");
+
+        if convert_from_another_format == "kraken" {
+            process_kraken_transactions(
+                input_file,
+                &(convert_from_another_format.to_owned() + output_file),
+            );
+        }
+
+        if convert_from_another_format == "bittrex" {
+            process_bittrex_transactions(
+                input_file,
+                &(convert_from_another_format.to_owned() + output_file),
+            );
+        }
+    } else {
+        let output_file = cli_args.value_of("output-file").unwrap_or("transactions");
+        let output_positions = cli_args.occurrences_of("p");
+
+        calculate_capital_gains(input_file, output_file, output_positions);
+    }
 }
