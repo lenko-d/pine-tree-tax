@@ -12,6 +12,7 @@ use tax::Transaction;
 
 use std::collections::HashMap;
 
+const WALLET_BANK: &str = "Bank";
 const WALLET_KRAKEN: &str = "Kraken";
 const WALLET_BITTREX: &str = "Bittrex";
 
@@ -118,13 +119,19 @@ pub fn process_kraken_transactions(file_path: &str, out_file: &str) {
     let mut ptt_transactons = Vec::new();
 
     for kraken_transaction in transactions.iter() {
-        let orig_asset = kraken_orig_asset(&kraken_transaction.pair, &kraken_transaction.type_);
+        let orig_asset =
+            kraken_orig_asset(&kraken_transaction.pair, &kraken_transaction.type_).to_string();
+
+        let mut origin_wallet = WALLET_KRAKEN.to_string();
+        if orig_asset == "USD" {
+            origin_wallet = WALLET_BANK.to_string();
+        }
 
         ptt_transactons.push(Transaction {
             id: kraken_transaction.txid.to_owned(),
             datetime: kraken_transaction.time,
-            origin_wallet: WALLET_KRAKEN.to_string(),
-            origin_asset: orig_asset.to_string(),
+            origin_wallet: origin_wallet,
+            origin_asset: orig_asset,
             origin_quantity: kraken_transaction.cost,
             destination_wallet: WALLET_KRAKEN.to_string(),
             destination_asset: kraken_dest_asset(
