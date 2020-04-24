@@ -2,6 +2,13 @@
 
 Pine Tree Tax is a crypto currency capital gains calculator implemented in [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)).
 
+Pine Tree Tax uses the Double-entry bookkeeping method of accounting. Every transaction is recorded as both a debit and a credit in the general ledger. The totals of each should always balance. If there is a value difference between debits and credits then this indicates a recording error.
+
+Advantages of double-entry accounting over single-entry methods:
+
+* Double-entry accounting helps guarantee accurate financial records by revealing data entry errors.
+* Double-entry accounting provides a complete record of financial transactions.
+
 
 # Cryptocurrencies according to the IRS
 The IRS addressed the taxation of cryptocurrency transactions in [Notice 2014-21](https://www.irs.gov/pub/irs-drop/n-14-21.pdf). According to that notice crypto currencies are treated as property for tax purposes and taxpayers must recognize gain or loss on the exchange of cryptocurrency for cash or for other property. Gain or loss is also recognized every time a cryptocurrency is sold or used to purchase goods or services. 
