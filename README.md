@@ -114,4 +114,3 @@ cargo run --  BittrexOrderHistory_2017.csv -c bittrex
 
 
 
-PTT is inspired by [cryptogains](https://github.com/chadlieberman/cryptogains)
