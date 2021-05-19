@@ -6,8 +6,8 @@ Pine Tree Tax uses the Double-entry bookkeeping method of accounting. Every tran
 
 Advantages of double-entry accounting over single-entry methods:
 
-* Double-entry accounting helps guarantee accurate financial records by revealing data entry errors.
-* Double-entry accounting provides a complete record of financial transactions.
+* Helps in guaranteeing accurate financial records by revealing data entry errors.
+* Provides a complete record of financial transactions.
 
 
 # Cryptocurrencies according to the IRS
