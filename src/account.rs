@@ -12,9 +12,9 @@ pub struct Deposit {
 impl Deposit {
     pub fn new(datetime: DateTime<Utc>, quantity: f64, usd_value: f64) -> Deposit {
         Deposit {
-            datetime: datetime,
-            quantity: quantity,
-            usd_value: usd_value,
+            datetime,
+            quantity,
+            usd_value,
             remaining_quantity: quantity,
         }
     }
@@ -44,14 +44,14 @@ impl Account {
             let existing_account_datetime =
                 DateTime::<Utc>::from_utc(some_date_time_in_the_past, Utc);
 
-            assert!(name == "USD");
+            assert_eq!(name, "USD");
             deposits.push(Deposit::new(existing_account_datetime, balance, balance));
         }
 
         Account {
             name,
             balance,
-            deposits: deposits,
+            deposits,
         }
     }
 
@@ -66,7 +66,7 @@ impl Account {
         let mut deposits: Vec<Deposit> = Vec::new();
 
         for candidate_to_withdraw_index in 0..self.deposits.len() {
-            let mut candidate = self.deposits.get_mut(candidate_to_withdraw_index).unwrap();
+            let candidate = self.deposits.get_mut(candidate_to_withdraw_index).unwrap();
 
             if candidate.datetime > datetime {
                 panic!("Candidate is in the future!")

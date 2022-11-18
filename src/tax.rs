@@ -97,8 +97,8 @@ pub fn calculate_capital_gains(file_path: &str, output_file: &str, output_positi
                     asset: transaction.origin_asset.clone(),
                     buy_date: deposit.datetime,
                     sell_date: transaction.datetime,
-                    cost_basis: cost_basis,
-                    proceeds: proceeds,
+                    cost_basis,
+                    proceeds,
                     gain: round_to_dollars(proceeds - cost_basis),
                 });
             }
