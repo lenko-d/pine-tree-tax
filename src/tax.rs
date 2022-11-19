@@ -42,7 +42,7 @@ struct TaxEvent {
     gain: f64,
 }
 
-pub fn calculate_capital_gains(file_path: &str, output_file: &str, output_positions: u64) {
+pub fn calculate_capital_gains(tax_accounting_method: &str, file_path: &str, output_file: &str, output_positions: u64) {
     let mut transactions = read_transactions(file_path).expect("Can't read transactions");
     transactions.sort_by(|t1, t2| t1.datetime.cmp(&t2.datetime));
 
@@ -61,7 +61,7 @@ pub fn calculate_capital_gains(file_path: &str, output_file: &str, output_positi
         "XZC".to_string() =>  Account::new("XZC".to_string(), 0.0),
     };
 
-    let mut tax_events: Vec<TaxEvent> = Vec::new();
+    let mut tax_events: Vec<TaxEvent> = vec![];
 
     for transaction in transactions.iter() {
         if transaction.origin_asset == transaction.destination_asset
@@ -70,10 +70,10 @@ pub fn calculate_capital_gains(file_path: &str, output_file: &str, output_positi
         {
             continue;
         }
-        let mut deposits: Vec<Deposit> = Vec::new();
+        let mut deposits: Vec<Deposit> = vec![];
         if transaction.origin_wallet != WALLET_NA {
             if let Some(account) = accounts.get_mut(&transaction.origin_asset) {
-                deposits = account.withdraw(transaction.datetime, transaction.origin_quantity)
+                deposits = account.withdraw(transaction.datetime, transaction.origin_quantity, tax_accounting_method)
             }
         }
 
@@ -149,7 +149,7 @@ fn save_to_file(tax_events: &Vec<TaxEvent>, out_file: &str, filter_by: &str) {
 pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>> {
     let file = File::open(file_path)?;
     let mut reader = csv::Reader::from_reader(file);
-    let mut transactions = Vec::new();
+    let mut transactions = vec![];
     for transaction in reader.deserialize() {
         transactions.push(transaction?);
     }

@@ -42,7 +42,7 @@ Cryptocurrency can be donated directly to a charity. The tax deduction will be e
 # Pine Tree Tax
 
 
-PTT uses the FIFO (first in, first out) method of accounting. It considers every transaction between two different cryptocurrencies as a taxable event. It tracks the cost basis from the price of the original purchase and transferrs that cost basis from the original token to the new token.
+PTT provides the FIFO (first in, first out) and LIFO (last in, first out) methods of accounting. It considers every transaction between two different cryptocurrencies as a taxable event. It tracks the cost basis from the price of the original purchase and transfers that cost basis from the original token to the new token.
 
 
 Capital gains or losses events are triggered when a cryptocurrency is sold for USD or when a quantity is transferred to an account not owned by me.
@@ -86,12 +86,17 @@ The application generates 2 output files in .csv format (long and short term cap
 ```
 cargo run -- <INPUT_FILE_NAME>
 ```
-## Convert from Kraken transaction format to Pinte Tree Tax format:
+By default, PTT uses LIFO accounting. To specify FIFO use the -a parameter:
+```
+run -- transactions.csv -a FIFO
+```
+
+## Convert from Kraken transaction format to Pine Tree Tax format:
 ```
 cargo run --   trades.csv -c kraken 
 ```
 
-## Convert from Bittrex transaction format to Pinte Tree Tax format:
+## Convert from Bittrex transaction format to Pine Tree Tax format:
 ```
 cargo run --  BittrexOrderHistory_2017.csv -c bittrex
 ```

@@ -104,7 +104,7 @@ fn read_kraken_transactions(file_path: &str) -> Result<Vec<KrakenTransaction>, B
 
     let mut reader = csv::Reader::from_reader(file);
 
-    let mut transactions = Vec::new();
+    let mut transactions = vec![];
     for transaction in reader.deserialize() {
         transactions.push(transaction?);
     }
@@ -116,7 +116,7 @@ pub fn process_kraken_transactions(file_path: &str, out_file: &str) {
     let mut transactions = read_kraken_transactions(file_path).expect("Can't read transactions");
     transactions.sort_by(|t1, t2| t1.time.cmp(&t2.time));
 
-    let mut ptt_transactons = Vec::new();
+    let mut ptt_transactons = vec![];
 
     for kraken_transaction in transactions.iter() {
         let orig_asset =
@@ -229,7 +229,7 @@ fn read_bittrex_transactions(file_path: &str) -> Result<Vec<BittrexTransaction>,
 
     let mut reader = csv::Reader::from_reader(file);
 
-    let mut transactions = Vec::new();
+    let mut transactions = vec![];
     for transaction in reader.deserialize() {
         transactions.push(transaction?);
     }
@@ -241,7 +241,7 @@ pub fn process_bittrex_transactions(file_path: &str, out_file: &str) {
     let mut transactions = read_bittrex_transactions(file_path).expect("Can't read transactions");
     transactions.sort_by(|t1, t2| t1.TimeStamp.cmp(&t2.TimeStamp));
 
-    let mut ptt_transactons = Vec::new();
+    let mut ptt_transactons = vec![];
 
     for bittrex_transaction in transactions.iter() {
         dbg!(bittrex_transaction);

@@ -15,6 +15,7 @@ mod tax;
 use clap::{App, Arg, ArgMatches};
 use conversions::*;
 use tax::*;
+use account::{TAX_ACCOUNTING_METHOD_LIFO};
 
 fn read_arguments<'a>() -> ArgMatches<'a> {
     App::new("Pine Tree Tax")
@@ -24,6 +25,14 @@ fn read_arguments<'a>() -> ArgMatches<'a> {
                 .help("Sets the input file to use")
                 .required(true)
                 .index(1),
+        )
+        .arg(
+            Arg::with_name("tax-accounting-method")
+                .help("tax accounting method: FIFO (First-In-First-Out) or LIFO (Last-In-First-Out)")
+                .short("a")
+                .required(false)
+                .takes_value(true)
+                .value_name("LIFO_OR_FIFO"),
         )
         .arg(
             Arg::with_name("convert-from")
@@ -71,9 +80,10 @@ fn main() {
             );
         }
     } else {
+        let tax_accounting_method = cli_args.value_of("tax-accounting-method").unwrap_or(TAX_ACCOUNTING_METHOD_LIFO);
         let output_file = cli_args.value_of("output-file").unwrap_or("transactions");
         let output_positions = cli_args.occurrences_of("p");
 
-        calculate_capital_gains(input_file, output_file, output_positions);
+        calculate_capital_gains(tax_accounting_method, input_file, output_file, output_positions);
     }
 }

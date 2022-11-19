@@ -1,6 +1,9 @@
 extern crate chrono;
 use self::chrono::prelude::*;
 
+pub const TAX_ACCOUNTING_METHOD_FIFO: &str = "FIFO";
+pub const TAX_ACCOUNTING_METHOD_LIFO: &str = "LIFO";
+
 #[derive(Debug)]
 pub struct Deposit {
     pub datetime: DateTime<Utc>,
@@ -37,7 +40,7 @@ pub struct Account {
 
 impl Account {
     pub fn new(name: String, balance: f64) -> Account {
-        let mut deposits = Vec::new();
+        let mut deposits = vec![];
 
         if balance > 0.0 {
             let some_date_time_in_the_past = NaiveDateTime::from_timestamp(1_000_000_000, 0);
@@ -62,37 +65,42 @@ impl Account {
         self.balance += quantity;
     }
 
-    pub fn withdraw(&mut self, datetime: DateTime<Utc>, mut quantity: f64) -> Vec<Deposit> {
-        let mut deposits: Vec<Deposit> = Vec::new();
+    pub fn withdraw(&mut self, datetime: DateTime<Utc>, mut quantity: f64, tax_accounting_method: &str) -> Vec<Deposit> {
+        let mut withdrawnQuantities = vec![];
 
-        for candidate_to_withdraw_index in 0..self.deposits.len() {
-            let candidate = self.deposits.get_mut(candidate_to_withdraw_index).unwrap();
+        let filterByDateAndRemainingQuantity= |x :&&mut Deposit| x.datetime < datetime && x.remaining_quantity > 0.0;
 
-            if candidate.datetime > datetime {
-                panic!("Candidate is in the future!")
+        let calculateWithdrawals = |x: &mut Deposit, quantity: &mut f64, balance: &mut f64, withdrawn: &mut Vec<Deposit>| {
+            if *quantity <= 0.0 {
+                return ;
             };
 
-            if candidate.remaining_quantity <= 0.0 {
-                continue;
-            };
-
-            let sold_quantity = candidate.remaining_quantity.min(quantity);
+            let sold_quantity = x.remaining_quantity.min(*quantity);
             let deposit = Deposit::new(
-                candidate.datetime,
+                x.datetime,
                 sold_quantity,
-                candidate.usd_value * (sold_quantity / candidate.quantity),
+                x.usd_value * (sold_quantity / x.quantity),
             );
-            deposits.push(deposit);
-            candidate.claim(sold_quantity);
-            quantity -= sold_quantity;
-            self.balance -= sold_quantity;
+            withdrawn.push(deposit);
+            x.claim(sold_quantity);
+            *quantity -= sold_quantity;
+            *balance -= sold_quantity;
+        };
 
-            if quantity <= 0.0 {
-                break;
-            };
+        let it = self.deposits.iter_mut().filter(filterByDateAndRemainingQuantity);
+        if tax_accounting_method == TAX_ACCOUNTING_METHOD_LIFO {
+            for x in it.rev() {
+                calculateWithdrawals(x, &mut quantity, &mut self.balance, &mut withdrawnQuantities);
+            }
+        } else if tax_accounting_method == TAX_ACCOUNTING_METHOD_FIFO {
+            for x in it {
+                calculateWithdrawals(x, &mut quantity, &mut self.balance, &mut withdrawnQuantities);
+            }
+        } else {
+            panic!("Unsupported tax_accounting_method:{}", tax_accounting_method);
         }
 
-        //dbg!(&deposits);
-        return deposits;
+        //dbg!(&withdrawnQuantities);
+        withdrawnQuantities
     }
 }
