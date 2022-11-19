@@ -1,8 +1,9 @@
 ![Pine Tree Tax](/images/pine_tree_tax_big.png)
 
-Pine Tree Tax is a crypto currency capital gains calculator implemented in [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)).
+Pine Tree Tax is a cryptocurrency capital gains calculator implemented in [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)).
 
-Pine Tree Tax uses the Double-entry bookkeeping method of accounting. Every transaction is recorded as both a debit and a credit in the general ledger. The totals of each should always balance. If there is a value difference between debits and credits then this indicates a recording error.
+Pine Tree Tax uses the double-entry bookkeeping method of accounting. Every transaction is recorded as both a debit and a credit in the general ledger. 
+The totals of each should always balance. If there is a value difference between debits and credits then this indicates a recording error.
 
 Advantages of double-entry accounting over single-entry methods:
 
@@ -11,13 +12,17 @@ Advantages of double-entry accounting over single-entry methods:
 
 
 # Cryptocurrencies according to the IRS
-The IRS addressed the taxation of cryptocurrency transactions in [Notice 2014-21](https://www.irs.gov/pub/irs-drop/n-14-21.pdf). According to that notice crypto currencies are treated as property for tax purposes and taxpayers must recognize gain or loss on the exchange of cryptocurrency for cash or for other property. Gain or loss is also recognized every time a cryptocurrency is sold or used to purchase goods or services. 
+The IRS addressed the taxation of cryptocurrency transactions in [Notice 2014-21](https://www.irs.gov/pub/irs-drop/n-14-21.pdf). 
+According to that notice cryptocurrencies are treated as property for tax purposes and taxpayers must recognize gain or loss on the exchange of 
+cryptocurrency for cash or for other property. Gain or loss is also recognized every time a cryptocurrency is sold or used to purchase goods or services. 
 
 # Types of transactions:
 ## Settled for cash
-A taxpayer who sells a crypto currency position for cash must report a capital gain on Form 8949. A position held for one year or less is considered a short-term capital gain taxed at ordinary tax rates. A position held for more than one year is considered a long-term capital gain.
+A taxpayer who sells a cryptocurrency position for cash must report a capital gain on Form 8949. A position held for one year or less is considered 
+a short-term capital gain taxed at ordinary tax rates. A position held for more than one year is considered a long-term capital gain.
 
-As with stock trades, capital losses offset capital gains in full, and a net capital loss is limited to $3,000 ($1,500 for married taxpayers filing separately) against other types of income on an individual tax return. An excess capital loss is carried forward to the subsequent tax year.
+As with stock trades, capital losses offset capital gains in full, and a net capital loss is limited to $3,000 ($1,500 for married taxpayers filing 
+separately) against other types of income on an individual tax return. An excess capital loss is carried forward to the subsequent tax year.
 
 Under IRS rules, the default for stock transactions is the first-in, first-out (FIFO) method of accounting.
 
@@ -25,16 +30,18 @@ Under IRS rules, the default for stock transactions is the first-in, first-out (
 Crypto-to-crypto trades generate tax liability.
 
 ## Cryptocurrency mining.
-When a taxpayer mines a cryptocurrency, the fair market value of the coins mined should be included in gross income. The amount of the income equals the market price of the coins on the day they were awarded on the blockchain.
+When a taxpayer mines a cryptocurrency, the fair market value of the coins mined should be included in gross income. The amount of the income equals 
+the market price of the coins on the day they were awarded on the blockchain.
 
 ## Payment for goods and services.
-Paying for coffee with crypto currencies is a taxable event.
+Paying for coffee with cryptocurrencies is a taxable event.
 
 ## Chain forks and airdrops.
 Have to report taxable income using market value on the day of the split or airdrop.
 
 ## Donating cryptocurrency.
-Cryptocurrency can be donated directly to a charity. The tax deduction will be equal to the fair market value of the donated coins, and the donor will not pay tax on the gain. 
+Cryptocurrency can be donated directly to a charity. The tax deduction will be equal to the fair market value of the donated coins, 
+and the donor will not pay tax on the gain. 
 
 ---
 
@@ -42,13 +49,15 @@ Cryptocurrency can be donated directly to a charity. The tax deduction will be e
 # Pine Tree Tax
 
 
-PTT provides the FIFO (first in, first out) and LIFO (last in, first out) methods of accounting. It considers every transaction between two different cryptocurrencies as a taxable event. It tracks the cost basis from the price of the original purchase and transfers that cost basis from the original token to the new token.
+PTT provides the FIFO (first in, first out) and LIFO (last in, first out) methods of accounting. It considers every transaction 
+between two different cryptocurrencies as a taxable event. It tracks the cost basis from the price of the original purchase and transfers that 
+cost basis from the original token to the new token.
 
 
 Capital gains or losses events are triggered when a cryptocurrency is sold for USD or when a quantity is transferred to an account not owned by me.
 
 
-PTT is a command line application that reads the crypto currency transactions from an input .csv file. Example transaction file:
+PTT is a command line application that reads the cryptocurrency transactions from an input .csv file. Example transaction file:
 
 ```
 | id | datetime                 | origin_wallet | origin_asset | origin_quantity | destination_wallet | destination_asset | destination_quantity | usd_value | usd_fee |
@@ -69,7 +78,7 @@ The value in the field "usd_value" represents the market value of the transactio
 ---
 
 
-The application generates 2 output files in .csv format (long and short term capitail gains). Example output file:
+The application generates 2 output files in .csv format (long and short term capital gains). Example output file:
 
 |           quantity | asset | buy_date             | sell_date            | cost_basis | proceeds |     gain |
 |--------------------|-------|----------------------|----------------------|------------|----------|----------|
