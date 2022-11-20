@@ -139,7 +139,7 @@ pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>
 
 #[cfg(test)]
 mod tests {
-    use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
+    use chrono::{DateTime, TimeZone, Utc};
     use account::TAX_ACCOUNTING_METHOD_FIFO;
     use super::*;
 
@@ -192,15 +192,13 @@ mod tests {
 
     #[test]
     fn fifo_accounting_gains() {
-        let transactions = test_transactions_eth_buy2_sell1();
-        let tax_events = calculate_capital_gains(transactions, TAX_ACCOUNTING_METHOD_FIFO,  0);
+        let tax_events = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_FIFO,  0);
         assert_eq!(tax_events.get(0).unwrap().gain, 750.0);
     }
 
     #[test]
     fn lifo_accounting_gains() {
-        let transactions = test_transactions_eth_buy2_sell1();
-        let tax_events = calculate_capital_gains(transactions, TAX_ACCOUNTING_METHOD_LIFO,  0);
+        let tax_events = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_LIFO,  0);
         assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
     }
 }
