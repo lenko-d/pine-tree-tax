@@ -14,8 +14,8 @@ use account::Deposit;
 const WALLET_EXTERNAL: &str = "External";
 const WALLET_NA: &str = "N/A";
 
-const CAPITAL_GAIN_TYPE_LONG: &str = "long";
-const CAPITAL_GAIN_TYPE_SHORT: &str = "short";
+pub const CAPITAL_GAIN_TYPE_LONG: &str = "long";
+pub const CAPITAL_GAIN_TYPE_SHORT: &str = "short";
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Transaction {
@@ -32,18 +32,17 @@ pub struct Transaction {
 }
 
 #[derive(Debug, Serialize)]
-struct TaxEvent {
-    quantity: f64,
-    asset: String,
-    buy_date: DateTime<Utc>,
-    sell_date: DateTime<Utc>,
-    cost_basis: f64,
-    proceeds: f64,
-    gain: f64,
+pub struct TaxEvent {
+    pub quantity: f64,
+    pub asset: String,
+    pub buy_date: DateTime<Utc>,
+    pub sell_date: DateTime<Utc>,
+    pub cost_basis: f64,
+    pub proceeds: f64,
+    pub gain: f64,
 }
 
-pub fn calculate_capital_gains(tax_accounting_method: &str, file_path: &str, output_file: &str, output_positions: u64) {
-    let mut transactions = read_transactions(file_path).expect("Can't read transactions");
+pub fn calculate_capital_gains(mut transactions: Vec<Transaction>, tax_accounting_method: &str, output_positions: u64) -> Vec<TaxEvent> {
     transactions.sort_by(|t1, t2| t1.datetime.cmp(&t2.datetime));
 
     let mut accounts = hashmap! {
@@ -111,49 +110,7 @@ pub fn calculate_capital_gains(tax_accounting_method: &str, file_path: &str, out
 
     //dbg!(&tax_events);
 
-    save_to_file(
-        &tax_events,
-        &(output_file.to_owned() + "_long_gains.csv"),
-        CAPITAL_GAIN_TYPE_LONG,
-    );
-    save_to_file(
-        &tax_events,
-        &(output_file.to_owned() + "_short_gains.csv"),
-        CAPITAL_GAIN_TYPE_SHORT,
-    );
-}
-
-fn save_to_file(tax_events: &Vec<TaxEvent>, out_file: &str, filter_by: &str) {
-    let file = File::create(out_file)
-        .ok()
-        .expect("Unable to create output file.");
-
-    let mut writer = csv::Writer::from_writer(file);
-
-    for tax_event in tax_events.iter() {
-        let time_elapsed = tax_event
-            .sell_date
-            .signed_duration_since(tax_event.buy_date);
-
-        if (time_elapsed >= Duration::days(365) && filter_by == CAPITAL_GAIN_TYPE_LONG)
-            || (time_elapsed < Duration::days(365) && filter_by == CAPITAL_GAIN_TYPE_SHORT)
-        {
-            writer
-                .serialize(tax_event)
-                .ok()
-                .expect("Unable to write to output file.");
-        }
-    }
-}
-
-pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>> {
-    let file = File::open(file_path)?;
-    let mut reader = csv::Reader::from_reader(file);
-    let mut transactions = vec![];
-    for transaction in reader.deserialize() {
-        transactions.push(transaction?);
-    }
-    Ok(transactions)
+    tax_events
 }
 
 fn round_to_dollars(num: f64) -> f64 {

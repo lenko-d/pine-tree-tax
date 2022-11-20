@@ -100,6 +100,11 @@ By default, PTT uses LIFO accounting. To specify FIFO use the -a parameter:
 run -- transactions.csv -a FIFO
 ```
 
+## Run test cases
+```
+cargo test
+```
+
 ## Convert from Kraken transaction format to Pine Tree Tax format:
 ```
 cargo run --   trades.csv -c kraken 
