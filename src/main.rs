@@ -149,30 +149,29 @@ mod tests {
         static ref DATE_TIME2 :DateTime<Utc> = Utc.with_ymd_and_hms(2017, 3, 1, 0, 1, 1).unwrap();
     );
 
-    #[test]
-    fn fifo_accounting_gains() {
+    fn test_transactions_eth_buy2_sell1() -> Vec<Transaction> {
         let t0 = Transaction{
             id: "0".to_string(),
             datetime: *DATE_TIME0,
             origin_wallet: "Bank".to_string(),
             origin_asset: "USD".to_string(),
-            origin_quantity: 7000.0,
+            origin_quantity: 2250.0,
             destination_wallet: "Coinbase".to_string(),
-            destination_asset: "BTC".to_string(),
-            destination_quantity: 10.0,
-            usd_value: 7000.0,
+            destination_asset: "ETH".to_string(),
+            destination_quantity: 1.0,
+            usd_value: 2250.0,
             usd_fee: None
         };
         let t1 = Transaction{
             id: "1".to_string(),
             datetime: *DATE_TIME1,
-            origin_wallet: "External".to_string(),
-            origin_asset: "BTC".to_string(),
-            origin_quantity: 1.0,
+            origin_wallet: "Bank".to_string(),
+            origin_asset: "USD".to_string(),
+            origin_quantity: 2500.0,
             destination_wallet: "Coinbase".to_string(),
             destination_asset: "ETH".to_string(),
-            destination_quantity: 30.0,
-            usd_value: 3000.0,
+            destination_quantity: 1.0,
+            usd_value: 2500.0,
             usd_fee: None
         };
         let t2 = Transaction{
@@ -180,63 +179,28 @@ mod tests {
             datetime: *DATE_TIME2,
             origin_wallet: "Conbase".to_string(),
             origin_asset: "ETH".to_string(),
-            origin_quantity: 30.0,
-            destination_wallet: "Coinbase".to_string(),
-            destination_asset: "ADA".to_string(),
-            destination_quantity: 10000.0,
-            usd_value: 6000.0,
+            origin_quantity: 1.0,
+            destination_wallet: "Bank".to_string(),
+            destination_asset: "USD".to_string(),
+            destination_quantity: 3000.0,
+            usd_value: 3000.0,
             usd_fee: None
         };
 
-        let transactions = vec![t0,t1,t2];
-        let tax_events = calculate_capital_gains(transactions, TAX_ACCOUNTING_METHOD_FIFO,  0);
+        vec![t0,t1,t2]
+    }
 
-        assert_eq!(tax_events.get(0).unwrap().gain, 2300.0);
-        assert_eq!(tax_events.get(1).unwrap().gain, 3000.0);
+    #[test]
+    fn fifo_accounting_gains() {
+        let transactions = test_transactions_eth_buy2_sell1();
+        let tax_events = calculate_capital_gains(transactions, TAX_ACCOUNTING_METHOD_FIFO,  0);
+        assert_eq!(tax_events.get(0).unwrap().gain, 750.0);
     }
 
     #[test]
     fn lifo_accounting_gains() {
-        let t0 = Transaction{
-            id: "0".to_string(),
-            datetime: *DATE_TIME0,
-            origin_wallet: "Bank".to_string(),
-            origin_asset: "USD".to_string(),
-            origin_quantity: 7000.0,
-            destination_wallet: "Coinbase".to_string(),
-            destination_asset: "BTC".to_string(),
-            destination_quantity: 10.0,
-            usd_value: 7000.0,
-            usd_fee: None
-        };
-        let t1 = Transaction{
-            id: "1".to_string(),
-            datetime: *DATE_TIME1,
-            origin_wallet: "External".to_string(),
-            origin_asset: "BTC".to_string(),
-            origin_quantity: 1.0,
-            destination_wallet: "Coinbase".to_string(),
-            destination_asset: "ETH".to_string(),
-            destination_quantity: 30.0,
-            usd_value: 3000.0,
-            usd_fee: None
-        };
-        let t2 = Transaction{
-            id: "2".to_string(),
-            datetime: *DATE_TIME2,
-            origin_wallet: "Conbase".to_string(),
-            origin_asset: "ETH".to_string(),
-            origin_quantity: 30.0,
-            destination_wallet: "Coinbase".to_string(),
-            destination_asset: "ADA".to_string(),
-            destination_quantity: 10000.0,
-            usd_value: 6000.0,
-            usd_fee: None
-        };
-
-        let transactions = vec![t0,t1,t2];
+        let transactions = test_transactions_eth_buy2_sell1();
         let tax_events = calculate_capital_gains(transactions, TAX_ACCOUNTING_METHOD_LIFO,  0);
-        assert_eq!(tax_events.get(0).unwrap().gain, 2300.0);
-        assert_eq!(tax_events.get(1).unwrap().gain, 3000.0);
+        assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
     }
 }
