@@ -66,11 +66,11 @@ impl Account {
     }
 
     pub fn withdraw(&mut self, datetime: DateTime<Utc>, mut quantity: f64, tax_accounting_method: &str) -> Vec<Deposit> {
-        let mut withdrawnQuantities = vec![];
+        let mut withdrawn_quantities = vec![];
 
-        let filterByDateAndRemainingQuantity= |x :&&mut Deposit| x.datetime < datetime && x.remaining_quantity > 0.0;
+        let filter_by_date_and_remaining_quantity = |x :&&mut Deposit| x.datetime < datetime && x.remaining_quantity > 0.0;
 
-        let calculateWithdrawals = |x: &mut Deposit, quantity: &mut f64, balance: &mut f64, withdrawn: &mut Vec<Deposit>| {
+        let calculate_withdrawals = |x: &mut Deposit, quantity: &mut f64, balance: &mut f64, withdrawn: &mut Vec<Deposit>| {
             if *quantity <= 0.0 {
                 return ;
             };
@@ -87,20 +87,19 @@ impl Account {
             *balance -= sold_quantity;
         };
 
-        let it = self.deposits.iter_mut().filter(filterByDateAndRemainingQuantity);
+        let it = self.deposits.iter_mut().filter(filter_by_date_and_remaining_quantity);
         if tax_accounting_method == TAX_ACCOUNTING_METHOD_LIFO {
             for x in it.rev() {
-                calculateWithdrawals(x, &mut quantity, &mut self.balance, &mut withdrawnQuantities);
+                calculate_withdrawals(x, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
             }
         } else if tax_accounting_method == TAX_ACCOUNTING_METHOD_FIFO {
             for x in it {
-                calculateWithdrawals(x, &mut quantity, &mut self.balance, &mut withdrawnQuantities);
+                calculate_withdrawals(x, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
             }
         } else {
             panic!("Unsupported tax_accounting_method:{}", tax_accounting_method);
         }
 
-        //dbg!(&withdrawnQuantities);
-        withdrawnQuantities
+        withdrawn_quantities
     }
 }
