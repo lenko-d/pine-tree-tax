@@ -12,9 +12,9 @@ use tax::Transaction;
 
 use std::collections::HashMap;
 
-const WALLET_BANK: &str = "Bank";
-const WALLET_KRAKEN: &str = "Kraken";
-const WALLET_BITTREX: &str = "Bittrex";
+pub const WALLET_BANK: &str = "Bank";
+pub const WALLET_KRAKEN: &str = "Kraken";
+pub const WALLET_BITTREX: &str = "Bittrex";
 
 lazy_static! {
     static ref KRAKEN_PAIRS: HashMap<String, (String, String)> = {
