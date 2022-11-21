@@ -3,6 +3,7 @@ use self::chrono::prelude::*;
 
 pub const TAX_ACCOUNTING_METHOD_FIFO: &str = "FIFO";
 pub const TAX_ACCOUNTING_METHOD_LIFO: &str = "LIFO";
+pub const TAX_ACCOUNTING_METHOD_HIFO: &str = "HIFO";
 
 #[derive(Debug)]
 pub struct Deposit {
@@ -89,12 +90,18 @@ impl Account {
 
         let it = self.deposits.iter_mut().filter(filter_by_date_and_remaining_quantity);
         if tax_accounting_method == TAX_ACCOUNTING_METHOD_LIFO {
-            for x in it.rev() {
-                calculate_withdrawals(x, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
+            for d in it.rev() {
+                calculate_withdrawals(d, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
             }
         } else if tax_accounting_method == TAX_ACCOUNTING_METHOD_FIFO {
-            for x in it {
-                calculate_withdrawals(x, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
+            for d in it {
+                calculate_withdrawals(d, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
+            }
+        } else if tax_accounting_method == TAX_ACCOUNTING_METHOD_HIFO {
+            let mut filtered_and_sorted_by_highest_cost_basis = it.collect::<Vec<&mut Deposit>>();
+            filtered_and_sorted_by_highest_cost_basis.sort_by(|a,b| b.usd_value.partial_cmp(&a.usd_value).unwrap() );
+            for d in filtered_and_sorted_by_highest_cost_basis.iter_mut() {
+                calculate_withdrawals(*d, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
             }
         } else {
             panic!("Unsupported tax_accounting_method:{}", tax_accounting_method);

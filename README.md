@@ -49,7 +49,7 @@ and the donor will not pay tax on the gain.
 # Pine Tree Tax
 
 
-PTT provides the FIFO (first in, first out) and LIFO (last in, first out) methods of accounting. It considers every transaction 
+PTT provides the FIFO (first in, first out), HIFO (highest in, first out) and LIFO (last in, first out) methods of accounting. It considers every transaction 
 between two different cryptocurrencies as a taxable event. It tracks the cost basis from the price of the original purchase and transfers that 
 cost basis from the original token to the new token.
 
@@ -95,7 +95,7 @@ The application generates 2 output files in .csv format (long and short term cap
 ```
 cargo run -- <INPUT_FILE_NAME>
 ```
-By default, PTT uses LIFO accounting. To specify FIFO use the -a parameter:
+By default, PTT uses LIFO accounting. To specify FIFO or HIFO use the -a parameter:
 ```
 run -- transactions.csv -a FIFO
 ```

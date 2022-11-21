@@ -140,7 +140,7 @@ pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>
 #[cfg(test)]
 mod tests {
     use chrono::{DateTime, TimeZone, Utc};
-    use account::TAX_ACCOUNTING_METHOD_FIFO;
+    use account::{TAX_ACCOUNTING_METHOD_FIFO, TAX_ACCOUNTING_METHOD_HIFO};
     use super::*;
 
     lazy_static!(
@@ -199,6 +199,12 @@ mod tests {
     #[test]
     fn lifo_accounting_gains() {
         let tax_events = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_LIFO,  0);
+        assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
+    }
+
+    #[test]
+    fn hifo_accounting_gains() {
+        let tax_events = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_HIFO,  0);
         assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
     }
 }
