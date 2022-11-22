@@ -14,13 +14,16 @@ mod account;
 mod conversions;
 mod tax;
 
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
+use std::hash::Hash;
+use std::io;
 use chrono::Duration;
 use clap::{App, Arg, ArgMatches};
 use conversions::*;
 use tax::*;
-use account::{TAX_ACCOUNTING_METHOD_LIFO};
+use account::{Account, TAX_ACCOUNTING_METHOD_LIFO};
 
 fn read_arguments<'a>() -> ArgMatches<'a> {
     App::new("Pine Tree Tax")
@@ -90,7 +93,7 @@ fn main() {
         let output_positions = cli_args.occurrences_of("p");
 
         let mut transactions = read_transactions(input_file).expect("Can't read transactions");
-        let tax_events = calculate_capital_gains(transactions, tax_accounting_method,  output_positions);
+        let (tax_events, accounts) = calculate_capital_gains(transactions, tax_accounting_method, output_positions);
         save_to_file(
             &tax_events,
             &(output_file.to_owned() + "_long_gains.csv"),
@@ -101,6 +104,10 @@ fn main() {
             &(output_file.to_owned() + "_short_gains.csv"),
             CAPITAL_GAIN_TYPE_SHORT,
         );
+
+        if let Some(a) = accounts {
+            save_accounts_to_file(a).expect("failed to save accounts file");
+        }
     }
 }
 
@@ -125,6 +132,26 @@ fn save_to_file(tax_events: &Vec<TaxEvent>, out_file: &str, filter_by: &str) {
                 .expect("Unable to write to output file.");
         }
     }
+}
+
+fn save_accounts_to_file(accounts: HashMap<String,Account>) -> Result<(), Box<dyn Error>>{
+    let out_file = "accounts.csv";
+    let file = File::create(out_file)
+        .ok()
+        .expect("Unable to create output file.");
+
+    let mut wtr = csv::Writer::from_writer(file);
+
+    wtr.write_record(&["Account", "Balance", "Deposit datetime", "Deposit USD value", "Deposit quantity", "Deposit remaining quantity"])?;
+    for (_currency, mut acct) in accounts {
+        acct.deposits.sort_by(|a,b| a.datetime.cmp(&b.datetime));
+        for dep in acct.deposits {
+            wtr.write_record(vec![acct.name.clone(), acct.balance.to_string(), dep.datetime.to_string(), dep.usd_value.to_string(), dep.quantity.to_string(), dep.remaining_quantity.to_string()])?;
+        }
+    }
+
+    wtr.flush()?;
+    Ok(())
 }
 
 pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>> {
@@ -192,19 +219,19 @@ mod tests {
 
     #[test]
     fn fifo_accounting_gains() {
-        let tax_events = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_FIFO,  0);
+        let (tax_events, accounts) = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_FIFO,  0);
         assert_eq!(tax_events.get(0).unwrap().gain, 750.0);
     }
 
     #[test]
     fn lifo_accounting_gains() {
-        let tax_events = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_LIFO,  0);
+        let (tax_events, accounts) = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_LIFO,  0);
         assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
     }
 
     #[test]
     fn hifo_accounting_gains() {
-        let tax_events = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_HIFO,  0);
+        let (tax_events, accounts) = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_HIFO,  0);
         assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
     }
 }

@@ -1,6 +1,7 @@
 extern crate chrono;
 extern crate csv;
 
+use std::collections::HashMap;
 use self::chrono::prelude::*;
 use self::chrono::Duration;
 use std::error::Error;
@@ -42,11 +43,11 @@ pub struct TaxEvent {
     pub gain: f64,
 }
 
-pub fn calculate_capital_gains(mut transactions: Vec<Transaction>, tax_accounting_method: &str, output_positions: u64) -> Vec<TaxEvent> {
+pub fn calculate_capital_gains(mut transactions: Vec<Transaction>, tax_accounting_method: &str, output_positions: u64) -> (Vec<TaxEvent>, Option<HashMap<String,Account>>) {
     transactions.sort_by(|t1, t2| t1.datetime.cmp(&t2.datetime));
 
     let mut accounts = hashmap! {
-        "USD".to_string() => Account::new("USD".to_string(), 100000.0),
+        "USD".to_string() => Account::new("USD".to_string(), 100000000.0),
         "BTC".to_string() => Account::new("BTC".to_string(), 0.0),
         "ETH".to_string() => Account::new("ETH".to_string(), 0.0),
         "BCH".to_string() =>  Account::new("BCH".to_string(), 0.0),
@@ -104,13 +105,11 @@ pub fn calculate_capital_gains(mut transactions: Vec<Transaction>, tax_accountin
         }
     }
 
-    if output_positions > 0 {
-        dbg!(accounts);
+    return if output_positions > 0 {
+        (tax_events, Some(accounts))
+    } else {
+        (tax_events, None)
     }
-
-    //dbg!(&tax_events);
-
-    tax_events
 }
 
 fn round_to_dollars(num: f64) -> f64 {

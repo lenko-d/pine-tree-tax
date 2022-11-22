@@ -90,14 +90,19 @@ The application generates 2 output files in .csv format (long and short term cap
 |         0.16960901 | BTC   | 2016-06-24T13:29:33Z | 2017-12-18T16:55:00Z |     113.63 |  3218.38 |  3104.75 |
 
 
-# Running
+# Usage
 ## Process a transaction file and generate long and short term capital gains reports in .csv format:
 ```
 cargo run -- <INPUT_FILE_NAME>
 ```
 By default, PTT uses LIFO accounting. To specify FIFO or HIFO use the -a parameter:
 ```
-run -- transactions.csv -a FIFO
+cargo run -- transactions.csv -a FIFO
+```
+
+## Use the -p parameter in order to save the accounts in a .csv file:
+```
+cargo run -- transactions.csv -a LIFO -p
 ```
 
 ## Run test cases
@@ -107,7 +112,7 @@ cargo test
 
 ## Convert from Kraken transaction format to Pine Tree Tax format:
 ```
-cargo run --   trades.csv -c kraken 
+cargo run -- trades.csv -c kraken 
 ```
 
 ## Convert from Bittrex transaction format to Pine Tree Tax format:

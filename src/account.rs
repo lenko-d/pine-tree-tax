@@ -34,9 +34,9 @@ impl Deposit {
 
 #[derive(Debug)]
 pub struct Account {
-    name: String,
-    balance: f64,
-    deposits: Vec<Deposit>,
+    pub name: String,
+    pub balance: f64,
+    pub deposits: Vec<Deposit>,
 }
 
 impl Account {
@@ -44,7 +44,7 @@ impl Account {
         let mut deposits = vec![];
 
         if balance > 0.0 {
-            let some_date_time_in_the_past = NaiveDateTime::from_timestamp(1_000_000_000, 0);
+            let some_date_time_in_the_past = NaiveDateTime::from_timestamp(1_000_000, 0);
             let existing_account_datetime =
                 DateTime::<Utc>::from_utc(some_date_time_in_the_past, Utc);
 
