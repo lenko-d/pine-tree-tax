@@ -69,11 +69,9 @@ impl Account {
     pub fn withdraw(&mut self, datetime: DateTime<Utc>, mut quantity: f64, tax_accounting_method: &str) -> Vec<Deposit> {
         let mut withdrawn_quantities = vec![];
 
-        let filter_by_date_and_remaining_quantity = |x :&&mut Deposit| x.datetime < datetime && x.remaining_quantity > 0.0;
-
         let calculate_withdrawals = |x: &mut Deposit, quantity: &mut f64, balance: &mut f64, withdrawn: &mut Vec<Deposit>| {
             if *quantity <= 0.0 {
-                return ;
+                return;
             };
 
             let sold_quantity = x.remaining_quantity.min(*quantity);
@@ -88,7 +86,7 @@ impl Account {
             *balance -= sold_quantity;
         };
 
-        let it = self.deposits.iter_mut().filter(filter_by_date_and_remaining_quantity);
+        let it = self.deposits.iter_mut().filter(|x| x.datetime < datetime && x.remaining_quantity > 0.0);
         if tax_accounting_method == TAX_ACCOUNTING_METHOD_LIFO {
             for d in it.rev() {
                 calculate_withdrawals(d, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
@@ -99,7 +97,7 @@ impl Account {
             }
         } else if tax_accounting_method == TAX_ACCOUNTING_METHOD_HIFO {
             let mut filtered_and_sorted_by_highest_cost_basis = it.collect::<Vec<&mut Deposit>>();
-            filtered_and_sorted_by_highest_cost_basis.sort_by(|a,b| b.usd_value.partial_cmp(&a.usd_value).unwrap() );
+            filtered_and_sorted_by_highest_cost_basis.sort_by(|a, b| b.usd_value.partial_cmp(&a.usd_value).unwrap());
             for d in filtered_and_sorted_by_highest_cost_basis.iter_mut() {
                 calculate_withdrawals(*d, &mut quantity, &mut self.balance, &mut withdrawn_quantities);
             }
