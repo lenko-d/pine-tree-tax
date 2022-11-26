@@ -1,7 +1,7 @@
 extern crate chrono;
 extern crate csv;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 
 use std::fs::File;
 

@@ -36,11 +36,11 @@ fn read_arguments<'a>() -> ArgMatches<'a> {
         )
         .arg(
             Arg::with_name("tax-accounting-method")
-                .help("tax accounting method: FIFO (First-In-First-Out) or LIFO (Last-In-First-Out)")
-                .short("a")
+                .help("tax accounting method: FIFO (First-In-First-Out), LIFO (Last-In-First-Out) or HIFO (High-In-First-Out)")
+                .short("m")
                 .required(false)
                 .takes_value(true)
-                .value_name("LIFO_OR_FIFO"),
+                .value_name("LIFO_FIFO_OR_HIFO"),
         )
         .arg(
             Arg::with_name("convert-from")
@@ -52,9 +52,16 @@ fn read_arguments<'a>() -> ArgMatches<'a> {
                 .value_name("FILE_FORMAT"),
         )
         .arg(
-            Arg::with_name("p")
-                .short("p")
-                .help("Output the positions in the accounts."),
+            Arg::with_name("a")
+                .short("a")
+                .long("save-accounts")
+                .help("Save the accounts in a .csv file."),
+        )
+        .arg(
+            Arg::with_name("e")
+                .short("e")
+                .long("save-transactions-tax-events")
+                .help("Save the transactions and the tax events in a .csv file."),
         )
         .arg(
             Arg::with_name("output-file")
@@ -90,10 +97,11 @@ fn main() {
     } else {
         let tax_accounting_method = cli_args.value_of("tax-accounting-method").unwrap_or(TAX_ACCOUNTING_METHOD_LIFO);
         let output_file = cli_args.value_of("output-file").unwrap_or("transactions");
-        let output_positions = cli_args.occurrences_of("p");
+        let output_accounts = cli_args.occurrences_of("a");
+        let output_transactions_and_tax_events = cli_args.occurrences_of("e");
 
-        let mut transactions = read_transactions(input_file).expect("Can't read transactions");
-        let (tax_events, accounts) = calculate_capital_gains(transactions, tax_accounting_method, output_positions);
+        let mut transactions = read_transactions(input_file).expect("read transactions");
+        let (tax_events, accounts) = calculate_capital_gains(&mut transactions, tax_accounting_method);
         save_to_file(
             &tax_events,
             &(output_file.to_owned() + "_long_gains.csv"),
@@ -105,10 +113,24 @@ fn main() {
             CAPITAL_GAIN_TYPE_SHORT,
         );
 
-        if let Some(a) = accounts {
-            save_accounts_to_file(a).expect("failed to save accounts file");
+        if output_transactions_and_tax_events > 0 {
+            save_transactions_and_tax_events_to_file(&transactions, &tax_events, &accounts, "transactions_and_tax_events.csv").expect("save transactions and tax events file");
+        }
+
+        if output_accounts > 0 {
+            save_accounts_to_file(accounts).expect("save accounts file");
         }
     }
+}
+
+pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>> {
+    let file = File::open(file_path)?;
+    let mut reader = csv::Reader::from_reader(file);
+    let mut transactions = vec![];
+    for transaction in reader.deserialize() {
+        transactions.push(transaction?);
+    }
+    Ok(transactions)
 }
 
 fn save_to_file(tax_events: &Vec<TaxEvent>, out_file: &str, filter_by: &str) {
@@ -154,14 +176,43 @@ fn save_accounts_to_file(accounts: HashMap<String,Account>) -> Result<(), Box<dy
     Ok(())
 }
 
-pub fn read_transactions(file_path: &str) -> Result<Vec<Transaction>, Box<Error>> {
-    let file = File::open(file_path)?;
-    let mut reader = csv::Reader::from_reader(file);
-    let mut transactions = vec![];
-    for transaction in reader.deserialize() {
-        transactions.push(transaction?);
+fn save_transactions_and_tax_events_to_file(transactions: &Vec<Transaction>, tax_events: &Vec<TaxEvent>, accounts: &HashMap<String, Account>, out_file: &str) -> Result<(), Box<dyn Error>>{
+    let file = File::create(out_file)
+        .ok()
+        .expect("the output file to be created.");
+
+    let mut wtr = csv::Writer::from_writer(file);
+
+    wtr.write_record(&["id","datetime","origin_wallet","origin_asset","origin_quantity","destination_wallet","destination_asset","destination_quantity","remaining_quantity","usd_value","usd_fee","buy_date","cost_basis","gain"])?;
+    for transaction in transactions {
+        let acct = accounts.get(transaction.destination_asset.as_str()).unwrap();
+        let mut remaining_quantity= transaction.destination_quantity;
+        for dep in &acct.deposits {
+            if dep.datetime == transaction.datetime{
+                remaining_quantity = dep.remaining_quantity;
+            }
+        }
+
+        let mut buy_date = "".to_string();
+        let mut cost_basis = 0.0;
+        let mut gain = 0.0;
+        for tax_event in tax_events {
+            if tax_event.sell_date == transaction.datetime {
+                buy_date = tax_event.buy_date.to_string();
+                cost_basis = tax_event.cost_basis;
+                gain = tax_event.gain;
+            }
+        }
+        wtr.write_record(vec![transaction.id.clone(), transaction.datetime.to_string(), transaction.origin_wallet.clone(),transaction.origin_asset.clone(),
+                              transaction.origin_quantity.to_string(),
+                              transaction.destination_wallet.clone(), transaction.destination_asset.clone(), transaction.destination_quantity.to_string(),
+                              remaining_quantity.to_string(),
+                              transaction.usd_value.to_string(),
+                              transaction.usd_fee.unwrap_or_default().to_string(),buy_date, cost_basis.to_string(), gain.to_string()])?;
     }
-    Ok(transactions)
+
+    wtr.flush()?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -219,19 +270,27 @@ mod tests {
 
     #[test]
     fn fifo_accounting_gains() {
-        let (tax_events, accounts) = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_FIFO,  0);
+        let (tax_events, accounts) = calculate_capital_gains(&mut test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_FIFO);
         assert_eq!(tax_events.get(0).unwrap().gain, 750.0);
     }
 
     #[test]
     fn lifo_accounting_gains() {
-        let (tax_events, accounts) = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_LIFO,  0);
+        let (tax_events, accounts) = calculate_capital_gains(&mut test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_LIFO);
         assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
     }
 
     #[test]
     fn hifo_accounting_gains() {
-        let (tax_events, accounts) = calculate_capital_gains(test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_HIFO,  0);
+        let (tax_events, accounts) = calculate_capital_gains(&mut test_transactions_eth_buy2_sell1(), TAX_ACCOUNTING_METHOD_HIFO);
         assert_eq!(tax_events.get(0).unwrap().gain, 500.0);
+    }
+
+    #[test]
+    fn save_transactions_and_tax_events() {
+        let mut transactions = test_transactions_eth_buy2_sell1();
+        let (tax_events, accounts) = calculate_capital_gains(&mut transactions, TAX_ACCOUNTING_METHOD_FIFO);
+
+        save_transactions_and_tax_events_to_file(&transactions, &tax_events, &accounts, "transactions_and_tax_events_test.csv").expect("the file to be saved");
     }
 }

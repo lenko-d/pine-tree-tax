@@ -95,15 +95,21 @@ The application generates 2 output files in .csv format (long and short term cap
 ```
 cargo run -- <INPUT_FILE_NAME>
 ```
-By default, PTT uses LIFO accounting. To specify FIFO or HIFO use the -a parameter:
+By default, PTT uses LIFO accounting method. To specify FIFO or HIFO use the -m parameter:
 ```
-cargo run -- transactions.csv -a FIFO
+cargo run -- transactions.csv -m FIFO
 ```
 
-## Use the -p parameter in order to save the accounts in a .csv file:
+## Use the -a parameter in order to save the accounts in a .csv file:
 ```
-cargo run -- transactions.csv -a LIFO -p
+cargo run -- transactions.csv -m FIFO -a
 ```
+
+## Use the -e parameter in order to save the transactions and the corresponding tax events in a .csv file:
+```
+cargo run -- transactions.csv -m FIFO -e
+```
+The generated file will show the remaining quantities which can be used when calculating the taxes for the next year. 
 
 ## Run test cases
 ```

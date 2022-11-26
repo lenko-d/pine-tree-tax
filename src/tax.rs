@@ -43,7 +43,7 @@ pub struct TaxEvent {
     pub gain: f64,
 }
 
-pub fn calculate_capital_gains(mut transactions: Vec<Transaction>, tax_accounting_method: &str, output_positions: u64) -> (Vec<TaxEvent>, Option<HashMap<String,Account>>) {
+pub fn calculate_capital_gains(mut transactions: &mut Vec<Transaction>, tax_accounting_method: &str) -> (Vec<TaxEvent>, HashMap<String,Account>) {
     transactions.sort_by(|t1, t2| t1.datetime.cmp(&t2.datetime));
 
     let mut accounts = hashmap! {
@@ -105,11 +105,7 @@ pub fn calculate_capital_gains(mut transactions: Vec<Transaction>, tax_accountin
         }
     }
 
-    return if output_positions > 0 {
-        (tax_events, Some(accounts))
-    } else {
-        (tax_events, None)
-    }
+    (tax_events, accounts)
 }
 
 fn round_to_dollars(num: f64) -> f64 {
