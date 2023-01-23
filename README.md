@@ -92,11 +92,16 @@ cargo run -- trades.csv -c kraken
 cargo run --  BittrexOrderHistory_2017.csv -c bittrex
 ```
 
+## License
+
+This project is licensed under the [MIT license].
+
+[MIT license]: https://github.com/lenko-d/pine-tree-tax/blob/master/LICENSE
 
 
 ---
 
-# Contributing
+## Contributing
 
 1. Fork it
 2. Download your fork to your PC (`git clone https://github.com/your_username/pine-tree-tax && cd pine-tree-tax`)
