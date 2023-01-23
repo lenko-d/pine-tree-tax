@@ -10,54 +10,20 @@ Advantages of double-entry accounting over single-entry methods:
 * Helps in guaranteeing accurate financial records by revealing data entry errors.
 * Provides a complete record of financial transactions.
 
+# Features
 
-# Cryptocurrencies according to the IRS
-The IRS addressed the taxation of cryptocurrency transactions in [Notice 2014-21](https://www.irs.gov/pub/irs-drop/n-14-21.pdf). 
-According to that notice cryptocurrencies are treated as property for tax purposes and taxpayers must recognize gain or loss on the exchange of 
-cryptocurrency for cash or for other property. Gain or loss is also recognized every time a cryptocurrency is sold or used to purchase goods or services. 
-
-# Types of transactions:
-## Settled for cash
-A taxpayer who sells a cryptocurrency position for cash must report a capital gain on Form 8949. A position held for one year or less is considered 
-a short-term capital gain taxed at ordinary tax rates. A position held for more than one year is considered a long-term capital gain.
-
-As with stock trades, capital losses offset capital gains in full, and a net capital loss is limited to $3,000 ($1,500 for married taxpayers filing 
-separately) against other types of income on an individual tax return. An excess capital loss is carried forward to the subsequent tax year.
-
-Under IRS rules, the default for stock transactions is the first-in, first-out (FIFO) method of accounting.
-
-## Exchanged for other cryptocurrencies.
-Crypto-to-crypto trades generate tax liability.
-
-## Cryptocurrency mining.
-When a taxpayer mines a cryptocurrency, the fair market value of the coins mined should be included in gross income. The amount of the income equals 
-the market price of the coins on the day they were awarded on the blockchain.
-
-## Payment for goods and services.
-Paying for coffee with cryptocurrencies is a taxable event.
-
-## Chain forks and airdrops.
-Have to report taxable income using market value on the day of the split or airdrop.
-
-## Donating cryptocurrency.
-Cryptocurrency can be donated directly to a charity. The tax deduction will be equal to the fair market value of the donated coins, 
-and the donor will not pay tax on the gain. 
-
----
-
-
-# Pine Tree Tax
-
-
-PTT provides the FIFO (first in, first out), HIFO (highest in, first out) and LIFO (last in, first out) methods of accounting. It considers every transaction 
+* PTT provides the FIFO (first in, first out), HIFO (highest in, first out) and LIFO (last in, first out) methods of accounting. It considers every transaction 
 between two different cryptocurrencies as a taxable event. It tracks the cost basis from the price of the original purchase and transfers that 
 cost basis from the original token to the new token.
 
 
-Capital gains or losses events are triggered when a cryptocurrency is sold for USD or when a quantity is transferred to an account not owned by me.
+* Capital gains or losses events are triggered when a cryptocurrency is sold for USD.
 
+* PTT can generate separate tax events file and accounts balances file that can be used when calculating the taxes for the next year.  
 
-PTT is a command line application that reads the cryptocurrency transactions from an input .csv file. Example transaction file:
+* Limited support for converting transactions history exports from Kraken and Bittrex. Limited because the transactions format convertor doesn't support all possible currency pairs. More pairs could be added in the future. PTT can be used to process transactions from other sources if the transactions are converted to the PTT's transactions file format described below.
+
+* PTT is a command line application that reads the cryptocurrency transactions from an input .csv file. Example transaction file:
 
 ```
 | id | datetime                 | origin_wallet | origin_asset | origin_quantity | destination_wallet | destination_asset | destination_quantity | usd_value | usd_fee |
@@ -78,7 +44,7 @@ The value in the field "usd_value" represents the market value of the transactio
 ---
 
 
-The application generates 2 output files in .csv format (long and short term capital gains). Example output file:
+* The application generates 2 output files in .csv format (long and short term capital gains). Example output file:
 
 |           quantity | asset | buy_date             | sell_date            | cost_basis | proceeds |     gain |
 |--------------------|-------|----------------------|----------------------|------------|----------|----------|
@@ -91,7 +57,7 @@ The application generates 2 output files in .csv format (long and short term cap
 
 
 # Usage
-## Process a transaction file and generate long and short term capital gains reports in .csv format:
+## Process a transactions file in PTT format and generate long and short term capital gains reports in .csv format:
 ```
 cargo run -- <INPUT_FILE_NAME>
 ```
@@ -116,12 +82,12 @@ The generated file will show the remaining quantities which can be used when cal
 cargo test
 ```
 
-## Convert from Kraken transaction format to Pine Tree Tax format:
+## Convert from Kraken transactions format to Pine Tree Tax format:
 ```
 cargo run -- trades.csv -c kraken 
 ```
 
-## Convert from Bittrex transaction format to Pine Tree Tax format:
+## Convert from Bittrex transactions format to Pine Tree Tax format:
 ```
 cargo run --  BittrexOrderHistory_2017.csv -c bittrex
 ```
