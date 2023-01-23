@@ -23,7 +23,7 @@ cost basis from the original token to the new token.
 
 * Limited support for converting transactions history exports from Kraken and Bittrex. Limited because the transactions format convertor doesn't support all possible currency pairs. More pairs could be added in the future. PTT can be used to process transactions from other sources if the transactions are converted to the PTT's transactions file format described below.
 
-* PTT is a command line application that reads the cryptocurrency transactions from an input .csv file. Example transaction file:
+* PTT is a command line application that reads cryptocurrency transactions from .csv file. Example transactions file:
 
 ```
 | id | datetime                 | origin_wallet | origin_asset | origin_quantity | destination_wallet | destination_asset | destination_quantity | usd_value | usd_fee |
